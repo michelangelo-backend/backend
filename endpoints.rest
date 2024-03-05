@@ -1,16 +1,27 @@
 ### GET all users
 GET http://localhost:3000/everything
-
+###
+GET http://localhost:3000/user
 ### POST user
-POST http://localhost:3000/user
+POST http://localhost:3000/signup
 Content-Type: application/json
 
 {
-"userName": "Bella Swan",
-"email": "bellaswan@proton.me",
-"password": "vampiresoverwerewolves"
+"userName": "austin2",
+"email": "testbro2@proton.me",
+"password": "ilovecoffee2",
+"scheduledHabitList": []
 }
+###
+POST http://localhost:3000/newuser
+Content-Type: application/json
 
+{
+"userName": "aus",
+"email": "testbro2@proton.me",
+"password": "ilovecoffee2",
+"scheduledHabitList": []
+}
 ### POST scheduled habit 
 POST http://localhost:3000/user/65de640e0d037b01441db970/habits
 Content-Type: application/json
