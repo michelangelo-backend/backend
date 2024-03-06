@@ -17,7 +17,7 @@ POST http://localhost:3000/newuser
 Content-Type: application/json
 
 {
-"userName": "aus",
+"username": "aus",
 "email": "testbro2@proton.me",
 "password": "ilovecoffee2",
 "scheduledHabitList": []

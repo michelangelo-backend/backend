@@ -35,11 +35,11 @@ app.post("/signup", (req, res) => {
   res.status(201).json(newHabitList);
 });
 //not working
-/* app.post("/newuser", (req, res) => {
+app.post("/newuser", (req, res) => {
   const newUser = new User(req.body);
   newUser.save();
   res.status(201).json(newUser);
-}); */
+});
 //Add habit
 app.post("/user/:userId/habits", (req, res) => {
   HabitList.findById(req.params.userId)
