@@ -14,10 +14,28 @@ const userSchema = new mongoose.Schema({
       type: String,
       required: true,
     },
+    auth:{
+      type: String
+    },
   },
   {
     timestamps: true,
   }
 );
+userSchema.methods.isAutheticated = function () {
+  return this.auth !== null
+}
 
+userSchema.methods.getToken = function () {
+  console.log('Generating token')
+  let token 
+  if (this.auth) {
+    token = this.auth
+  } else {
+    token = auth.generateToken()
+    this.auth = token
+    this.save()
+  }
+  return token
+}
 module.exports = mongoose.model('User', userSchema);
