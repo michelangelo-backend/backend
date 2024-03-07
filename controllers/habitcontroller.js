@@ -13,7 +13,7 @@ exports.createHabit = async (req, res) => {
  try {
    const habit = new Habit({ habitName });
    const savedhabit = await habit.save();
-   res.status(201).json(savedSong);
+   res.status(201).json(savedHabit);
  } catch (error) {
    res.status(500).json({ error: 'An error occurred while creating the habit' });
  }
@@ -38,7 +38,7 @@ exports.getHabit = async (req, res) => {
       if (!habit) {
         return res.status(404).json({ error: 'No habit found' });
         }
-        res.json(song);
+        res.json(habit);
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while seeking habit' });
   }
@@ -64,7 +64,7 @@ exports.updateHabit = async (req, res) => {
 exports.deleteHabit = async (req, res) => {
   const habitId = req.params.id;
   try {
-    const deletedHabit = await Song.findByIdAndRemove(habitId);
+    const deletedHabit = await Habit.findByIdAndRemove(habitId);
     if (!deletedHabit) {
   return res.status(404).json({ error: 'No Habit found' });
   }
