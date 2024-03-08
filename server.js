@@ -4,7 +4,7 @@ const morgan = require("morgan");
 const mongoose = require("mongoose");
 const cors = require('cors');
 const users = require('./routes/userRoutes');
-
+const bcrypt = require('bcryptjs');
 
 const PORT = 3000;
 
@@ -28,6 +28,30 @@ app.get("/everything", (req, res) => {
 app.get("/user", (req, res) => {
   User.find().then((results) => res.status(200).json(results));
 });
+//Get user habits
+app.get("/habits", (req, res) => {
+  const token = req.headers.authorization
+  if (!token) {
+    return res.status(400).json({ message: "User error" })
+  }
+  User.findOne({ auth: token }).then((user) => {
+    Habit.find({ user }).then((results) =>
+    res.status(200).json(results))
+  })
+})
+//Add habit
+app.post("/habits", (req, res) => {
+  const token = req.headers.authorization
+  User.findOne({ auth: token }).then((user) => {
+    if (!user) {
+      return res.status(404).json({ message: "not found" })
+    }
+    const newHabit = new Habit({ ...req.body, user: user})
+          newHabit.save();
+        return res.status(200).json(newHabit);
+      })
+    .catch((error) => res.status(400).json({ message: "Bad request" }));
+})
 //Add user 
 /* app.post("/signup", (req, res) => {
   const newHabitList = new HabitList(req.body);
@@ -85,20 +109,7 @@ app.delete('/logout', (req, res) => {
     res.status(200).json({ message: "Logged out" })
   })
 })
-//Add habit
-app.post("/user/:userId/habits", (req, res) => {
-  HabitList.findById(req.params.userId)
-    .then((habitList) => {
-      if (habitList) {
-        habitList.scheduledHabitList.push({ habitTitle: req.body["habitTitle"], frequency: req.body["frequency"], completed: req.body["completed"] });
-        habitList.save();
-        return res.status(200).json(habitList);
-      } else {
-        return res.status(404).json({ message: "not found" });
-      }
-    })
-    .catch((error) => res.status(400).json({ message: "Bad request" }));
-});
+
 
 app.listen(process.env.PORT || PORT, () => {
   console.log(`Server running on port ${PORT}`);
