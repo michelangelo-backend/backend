@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const auth = require('../auth')
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -22,7 +23,7 @@ const userSchema = new mongoose.Schema({
     timestamps: true,
   }
 );
-userSchema.methods.isAutheticated = function () {
+userSchema.methods.isAuthenticated = function () {
   return this.auth !== null
 }
 

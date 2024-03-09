@@ -25,9 +25,16 @@ app.use("/users", users);
 app.get("/everything", (req, res) => {
   HabitList.find().then((results) => res.status(200).json(results));
 });
+
 app.get("/user", (req, res) => {
-  User.find().then((results) => res.status(200).json(results));
-});
+  const token = req.headers.authorization
+  if (!token) {
+    return res.status(400).json({ message: "User error" })
+  }
+  User.findOne({ auth: token }).then((user) =>
+    res.status(200).json(results))
+  })
+
 //Get user habits
 app.get("/habits", (req, res) => {
   const token = req.headers.authorization

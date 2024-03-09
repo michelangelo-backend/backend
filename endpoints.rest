@@ -1,6 +1,8 @@
 ### GET all users
 GET http://localhost:3000/everything
 ###
+GET http://localhost:3000/user
+###
 GET http://localhost:3000/habits
 Authorization: 
 ### POST user
