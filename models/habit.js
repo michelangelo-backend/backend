@@ -4,9 +4,10 @@ const mongoose = require ('mongoose');
 
 const habitSchema = new mongoose.Schema ({
     userID: {
-        type: mongoose.Schema.Types.ObjectId, 
+        type: mongoose.Schema.Types.ObjectId, ref: 'User', 
         required: true, 
-        ref: 'user',
+
+        /*ref: 'user',*/
     }, 
     habitName: {
         type: String, 
@@ -18,7 +19,7 @@ const habitSchema = new mongoose.Schema ({
     completed: {
         type: Boolean,
         default: false,
-    }
+    },
 })
 module.exports = mongoose.model("habit", habitSchema);
 
