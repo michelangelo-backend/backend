@@ -6,9 +6,9 @@ const cors = require('cors');
 const users = require('./routes/userRoutes');
 const bcrypt = require('bcryptjs');
 
-const PORT = process.env.PORT;
-
-mongoose.connect(process.env.DATABASE_URL);
+const PORT = 3000;
+//mongoose.connect(process.env.DATABASE_URL)
+mongoose.connect('mongodb+srv://austin:zlhHJ47JqHxraI1K@cluster0.eawefnj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0');
 const db = mongoose.connection;
 db.once("open", () => console.log("connected to mongoDB!!!!"));
 const User = require("./models/User");
@@ -25,15 +25,31 @@ app.use("/users", users);
 app.get("/everything", (req, res) => {
   HabitList.find().then((results) => res.status(200).json(results));
 });
-
+//get user
 app.get("/user", (req, res) => {
   const token = req.headers.authorization
   if (!token) {
     return res.status(400).json({ message: "User error" })
   }
+  User.findOne({ auth: token }).then((user) => {
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.setHeader('Cache-Control', 'no-store'); // Prevent caching
+    res.status(200).json(user);
+  }).catch(error => {
+    console.error("Error retrieving user:", error);
+    res.status(500).json({ message: "Internal server error" });
+  });
+});
+/* app.get("/user", (req, res) => {
+  const token = req.headers.authorization
+  if (!token) {
+    return res.status(400).json({ message: "User error" })
+  }
   User.findOne({ auth: token }).then((user) =>
-    res.status(200).json(results))
-  })
+    res.status(200).json(user))
+  }) */
 
 //Get user habits
 app.get("/habits", (req, res) => {
@@ -66,10 +82,10 @@ app.post("/habits", (req, res) => {
   res.status(201).json(newHabitList);
 }); */
 const validateAuthRequestBody = (req, res, next) => {
-  if (Object.keys(req.body).includes('password', 'username')) {
+  if (Object.keys(req.body).includes('password', 'email')) {
 next()
   } else {
-    res.status(400).json({ message: 'Username and password required'})
+    res.status(400).json({ message: 'Email and password required'})
   }
 }
 //new user sign up
@@ -98,12 +114,16 @@ app.post('/login', validateAuthRequestBody, (req, res) => {
       if (result) {
         const token = user.getToken()
         res.status(200).json({ auth: token })
+        console.log(token)
       } else {
-        res.status(400).json({ message: "Login error" })
+        res.status(400).json({ message: "Invalid Password" })
       }
-    })
-    })
-  })
+    });
+  }).catch(error => {
+    console.error("Error finding user:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  });
+});
 //logout
 app.delete('/logout', (req, res) => {
   const token = req.headers.authorization
