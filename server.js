@@ -27,7 +27,7 @@ app.get("/everything", (req, res) => {
 });
 //get user
 app.get("/user", (req, res) => {
-  const token = req.headers.authorization
+  const token = req.headers.authorization.split(" ")[1];
   if (!token) {
     return res.status(400).json({ message: "User error" })
   }
