@@ -1,0 +1,15 @@
+const express = require('express')
+
+### GETTING ALL HAITS
+GET http://localhost:3000/lists/
+
+### CREATING A NEW HABIT
+POST http://localhost:3000/lists
+Content-Type: application/json
+
+{"title": "List"}
+
+### GET HABIT BY HABIT ID
+GET http://localhost:3000/lists/65cc0b300034dd14acb650c5
+
+

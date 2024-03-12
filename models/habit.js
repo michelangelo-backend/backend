@@ -1,25 +1,22 @@
-//THIS FILE IS A RESTART//
-
 const mongoose = require ('mongoose');
 
 const habitSchema = new mongoose.Schema ({
-    userID: {
-        type: mongoose.Schema.Types.ObjectId, ref: 'User', 
-        required: true, 
+    
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 
-        /*ref: 'user',*/
-    }, 
-    habitName: {
-        type: String, 
-        required: true, 
-    },
-    frequency: {
+    habitTitle:{
         type: String,
+        required: true
     }, 
-    completed: {
-        type: Boolean,
-        default: false,
+    namVal:{
+        type: Number, 
+        required: true
+    }, 
+    unit: {
+    type: String, 
+    required: true
     },
+
+
 })
 module.exports = mongoose.model("habit", habitSchema);
-
