@@ -36,11 +36,12 @@ Content-Type: application/json
 }
 
 ### POST scheduled habit 
-POST http://localhost:3000/user/65de640e0d037b01441db970/habits
+POST http://localhost:3000/habits
 Content-Type: application/json
+Authorization: $2a$10$GSJDcCGyVQzdxjM1fxm0huGlYmJ8uo8pTTujDo0qlUfrjL4uMTs9K
 
 {
-"habitTitle": "Have horrible acting",
+"habitName": "Have horrible acting",
 "frequency": "Every day",
 "completed": false
 }

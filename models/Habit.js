@@ -1,14 +1,31 @@
 const mongoose = require("mongoose");
 
 const habitSchema = new mongoose.Schema(
-          {
-            habitTitle: { type: String },
-            frequency: { type: String }, 
-            completed: { 
+        {
+          habitName: { 
+              type: String, 
+              required: true 
+            },
+          numVal: {
+              type: Number, 
+              required: true
+          }, 
+          unit: {
+            type: String, 
+            required: true
+            },
+          comment: { 
+              type: String 
+            }, 
+          completed: { 
               type: Boolean,
               default: false,
             },
-            user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+            streak: {
+              type: Number,
+              default: 0,
+            },
+          user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
           },
           { timestamps: true }  
         );

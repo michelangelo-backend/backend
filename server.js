@@ -12,7 +12,8 @@ mongoose.connect('mongodb+srv://austin:zlhHJ47JqHxraI1K@cluster0.eawefnj.mongodb
 const db = mongoose.connection;
 db.once("open", () => console.log("connected to mongoDB!!!!"));
 const User = require("./models/User");
-const HabitList = require("./models/HabitList");
+const Habit = require('./models/Habit');
+const Record = require("./models/Record");
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -21,10 +22,7 @@ app.use("/users", users);
 /* app.use(express.urlencoded({extended: true})); */ 
 
 
-//Get all DATA
-app.get("/everything", (req, res) => {
-  HabitList.find().then((results) => res.status(200).json(results));
-});
+
 //get user
 app.get("/user", (req, res) => {
   const token = req.headers.authorization.split(" ")[1];
@@ -53,7 +51,7 @@ app.get("/user", (req, res) => {
 
 //Get user habits
 app.get("/habits", (req, res) => {
-  const token = req.headers.authorization
+  const token = req.headers.authorization.split(" ");
   if (!token) {
     return res.status(400).json({ message: "User error" })
   }
@@ -64,7 +62,7 @@ app.get("/habits", (req, res) => {
 })
 //Add habit
 app.post("/habits", (req, res) => {
-  const token = req.headers.authorization
+  const token = req.headers.authorization.split(" ");
   User.findOne({ auth: token }).then((user) => {
     if (!user) {
       return res.status(404).json({ message: "not found" })
@@ -75,12 +73,36 @@ app.post("/habits", (req, res) => {
       })
     .catch((error) => res.status(400).json({ message: "Bad request" }));
 })
-//Add user 
-/* app.post("/signup", (req, res) => {
-  const newHabitList = new HabitList(req.body);
-  newHabitList.save();
-  res.status(201).json(newHabitList);
+//Add habit and record
+/* app.post("/habits", async (req, res) => {
+  try {
+    const token = req.headers.authorization.split(" ")[1];
+    const user = await User.findOne({ auth: token });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Create a new habit
+    const newHabit = new Habit({ ...req.body, user: user._id });
+    await newHabit.save();
+
+    // Create a record for the new habit
+    const newRecord = new Record({
+      habit: newHabit._id,
+      habitName: newHabit.habitName,
+      date: new Date(),
+      status: 'Incomplete',
+    });
+    await newRecord.save();
+
+    return res.status(200).json(newHabit);
+  } catch (error) {
+    console.error("Error creating habit:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 }); */
+//auth function
 const validateAuthRequestBody = (req, res, next) => {
   if (Object.keys(req.body).includes('password', 'email')) {
 next()
