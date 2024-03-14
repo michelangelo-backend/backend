@@ -8,9 +8,9 @@ const userRoutes = require('./routes/userRoutes');
 
 const bcrypt = require('bcryptjs');
 
-const PORT = 3000;
-//mongoose.connect(process.env.DATABASE_URL)
-mongoose.connect('mongodb+srv://austin:zlhHJ47JqHxraI1K@cluster0.eawefnj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0');
+const PORT = process.env.PORT;
+mongoose.connect(process.env.DATABASE_URL)
+
 const db = mongoose.connection;
 db.once("open", () => console.log("connected to mongoDB!!!!"));
 const User = require("./models/User");
