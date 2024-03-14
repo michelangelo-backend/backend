@@ -1,0 +1,47 @@
+### GET all users
+GET http://localhost:3000/everything
+###
+GET http://localhost:3000/user
+Authorization: t$2a$10$7PdSyhEahwpcIgJbcOcydO0qY/wLzXL.4I9l0cOyEXYyWBUbDwV5K
+###
+GET http://localhost:3000/habits
+Authorization: 
+### POST user
+POST http://localhost:3000/newuser
+Content-Type: application/json
+
+{
+"username": "austin2",
+"email": "testbro2@proton.me",
+"password": "ilovecoffee2",
+"scheduledHabitList": []
+}
+###
+POST http://localhost:3000/signup
+Content-Type: application/json
+
+{
+"username": "aus",
+"email": "testbro2@proton.me",
+"password": "ilovecoffee2",
+"scheduledHabitList": []
+}
+###
+POST http://localhost:3000/login 
+Content-Type: application/json
+
+{
+    "email": "anton", 
+    "password": "badpassword"
+}
+
+### POST scheduled habit 
+POST http://localhost:3000/habits
+Content-Type: application/json
+Authorization: $2a$10$GSJDcCGyVQzdxjM1fxm0huGlYmJ8uo8pTTujDo0qlUfrjL4uMTs9K
+
+{
+"habitName": "Have horrible acting",
+"frequency": "Every day",
+"completed": false
+}
