@@ -2,6 +2,9 @@ const mongoose = require('mongoose');
 
 const recordSchema = new mongoose.Schema({
     habit: { type: mongoose.Schema.Types.ObjectId, ref: 'Habit' },
+    date: {
+        type: Date
+    },
     status: {
       type: String,
       enum: ['Complete', 'Incomplete'],

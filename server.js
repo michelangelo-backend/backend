@@ -3,7 +3,9 @@ const express = require("express");
 const morgan = require("morgan");
 const mongoose = require("mongoose");
 const cors = require('cors');
-const users = require('./routes/userRoutes');
+const userRoutes = require('./routes/userRoutes');
+/* const habitRoutes = require('./routes/habitRoutes'); */
+
 const bcrypt = require('bcryptjs');
 
 const PORT = 3000;
@@ -18,7 +20,8 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(morgan('dev'));
-app.use("/users", users);
+app.use("/users", userRoutes);
+/* app.use("/habits", habitRoutes); */
 /* app.use(express.urlencoded({extended: true})); */ 
 
 
@@ -40,14 +43,6 @@ app.get("/user", (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   });
 });
-/* app.get("/user", (req, res) => {
-  const token = req.headers.authorization
-  if (!token) {
-    return res.status(400).json({ message: "User error" })
-  }
-  User.findOne({ auth: token }).then((user) =>
-    res.status(200).json(user))
-  }) */
 
 //Get user habits
 app.get("/habits", (req, res) => {
@@ -73,35 +68,33 @@ app.post("/habits", (req, res) => {
       })
     .catch((error) => res.status(400).json({ message: "Bad request" }));
 })
-//Add habit and record
-/* app.post("/habits", async (req, res) => {
+//add simple done record
+app.post("/habits/:habitId/done",async (req, res) => {
   try {
-    const token = req.headers.authorization.split(" ")[1];
-    const user = await User.findOne({ auth: token });
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Create a new habit
-    const newHabit = new Habit({ ...req.body, user: user._id });
-    await newHabit.save();
-
-    // Create a record for the new habit
-    const newRecord = new Record({
-      habit: newHabit._id,
-      habitName: newHabit.habitName,
-      date: new Date(),
-      status: 'Incomplete',
-    });
-    await newRecord.save();
-
-    return res.status(200).json(newHabit);
+      const token = req.headers.authorization.split(" ")[1];
+      const habitId = req.params.habitId;
+      const user = await User.findOne({ auth: token });
+      if (!user) {
+          return res.status(404).json({ message: "User not found" });
+      }
+      const habit = await Habit.findOne({ _id: habitId, user: user._id });
+      if (!habit) {
+          return res.status(404).json({ message: "Habit not found" });
+      }
+      const newRecord = new Record({
+          habit: habitId,
+          //date yyyy-MM-DD
+          date: new Date(),
+          status: 'Complete',
+      });
+      const savedRecord = await newRecord.save();
+      return res.status(201).json(savedRecord);
   } catch (error) {
-    console.error("Error creating habit:", error);
-    return res.status(500).json({ message: "Internal server error" });
+      console.error("Error adding record:", error);
+      return res.status(500).json({ message: "Internal server error" });
   }
-}); */
+});
+
 //auth function
 const validateAuthRequestBody = (req, res, next) => {
   if (Object.keys(req.body).includes('password', 'email')) {
@@ -146,6 +139,7 @@ app.post('/login', validateAuthRequestBody, (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   });
 });
+
 //logout
 app.delete('/logout', (req, res) => {
   const token = req.headers.authorization
