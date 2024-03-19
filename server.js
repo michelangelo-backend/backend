@@ -7,10 +7,10 @@ const userRoutes = require('./routes/userRoutes');
 /* const habitRoutes = require('./routes/habitRoutes'); */
 
 const bcrypt = require('bcryptjs');
-
-const PORT = 3000;
-//mongoose.connect(process.env.DATABASE_URL)
-mongoose.connect('mongodb+srv://austin:zlhHJ47JqHxraI1K@cluster0.eawefnj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0');
+//const PORT = 
+const PORT = process.env.DATABASE_URL;
+mongoose.connect(process.env.DATABASE_URL)
+/* mongoose.connect(); */
 const db = mongoose.connection;
 db.once("open", () => console.log("connected to mongoDB!!!!"));
 const User = require("./models/User");
@@ -45,7 +45,41 @@ app.get("/user", (req, res) => {
 });
 
 //Get user habits
-app.get("/habits", (req, res) => {
+app.get("/habits", async (req, res) => {
+  const token = req.headers.authorization.split(" ");
+  if (!token) {
+    return res.status(400).json({ message: "User error" });
+  }
+
+  try {
+    const user = await User.findOne({ auth: token });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const results = await Habit.find({ user });
+
+    // Check for conditional request headers
+    const ifModifiedSince = req.headers['if-modified-since'];
+    const lastModified = results.length > 0 ? results[0].updatedAt.toUTCString() : null;
+
+    if (ifModifiedSince && lastModified && new Date(ifModifiedSince) >= new Date(lastModified)) {
+      // Respond with 304 Not Modified if the resource hasn't changed
+      return res.status(304).end();
+    }
+
+    // Set Last-Modified header for caching
+    if (lastModified) {
+      res.set('Last-Modified', lastModified);
+    }
+
+    return res.status(200).json(results);
+  } catch (error) {
+    console.error("Error fetching habits:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+/* app.get("/habits", (req, res) => {
   const token = req.headers.authorization.split(" ");
   if (!token) {
     return res.status(400).json({ message: "User error" })
@@ -54,7 +88,7 @@ app.get("/habits", (req, res) => {
     Habit.find({ user }).then((results) =>
     res.status(200).json(results))
   })
-})
+}) */
 //Add habit
 app.post("/habits", (req, res) => {
   const token = req.headers.authorization.split(" ");
@@ -86,6 +120,7 @@ app.post("/habits/:habitId/done",async (req, res) => {
           //date yyyy-MM-DD
           date: new Date(),
           status: 'Complete',
+          note: req.body.note
       });
       const savedRecord = await newRecord.save();
       return res.status(201).json(savedRecord);
@@ -94,7 +129,33 @@ app.post("/habits/:habitId/done",async (req, res) => {
       return res.status(500).json({ message: "Internal server error" });
   }
 });
-
+//record missed habit
+app.post("/habits/:habitId/missed",async (req, res) => {
+  try {
+      const token = req.headers.authorization.split(" ")[1];
+      const habitId = req.params.habitId;
+      const user = await User.findOne({ auth: token });
+      if (!user) {
+          return res.status(404).json({ message: "User not found" });
+      }
+      const habit = await Habit.findOne({ _id: habitId, user: user._id });
+      if (!habit) {
+          return res.status(404).json({ message: "Habit not found" });
+      }
+      const newRecord = new Record({
+          habit: habitId,
+          //date yyyy-MM-DD
+          date: new Date(),
+          status: 'Incomplete',
+          note: req.body.note
+      });
+      const savedRecord = await newRecord.save();
+      return res.status(201).json(savedRecord);
+  } catch (error) {
+      console.error("Error adding record:", error);
+      return res.status(500).json({ message: "Internal server error" });
+  }
+});
 //auth function
 const validateAuthRequestBody = (req, res, next) => {
   if (Object.keys(req.body).includes('password', 'email')) {

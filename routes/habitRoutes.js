@@ -3,9 +3,10 @@ const router = express.Router();
 const Record = require('../models/Record');
 const User = require('../models/User');
 const Habit = require('../models/Habit');
+//NOT WORKING, but would like to make work
 
 // Endpoint to add a record of habit completion
-router.post("/habits/:habitId/done",async (req, res) => {
+/* router.post("/habits/:habitId/done",async (req, res) => {
     try {
         const token = req.headers.authorization.split(" ")[1];
         const habitId = req.params.habitId;
@@ -28,6 +29,6 @@ router.post("/habits/:habitId/done",async (req, res) => {
         console.error("Error adding record:", error);
         return res.status(500).json({ message: "Internal server error" });
     }
-  });
+  }); */
 
 module.exports = router;
