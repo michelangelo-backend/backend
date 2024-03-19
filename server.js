@@ -8,7 +8,7 @@ const userRoutes = require('./routes/userRoutes');
 
 const bcrypt = require('bcryptjs');
 
-const PORT = process.env.PORT;
+const PORT = process.env.DATABASE_URL;
 mongoose.connect(process.env.DATABASE_URL)
 
 const db = mongoose.connection;
@@ -86,6 +86,7 @@ app.post("/habits/:habitId/done",async (req, res) => {
           //date yyyy-MM-DD
           date: new Date(),
           status: 'Complete',
+          note: req.body.note,
       });
       const savedRecord = await newRecord.save();
       return res.status(201).json(savedRecord);
