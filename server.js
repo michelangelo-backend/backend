@@ -95,7 +95,33 @@ app.post("/habits/:habitId/done",async (req, res) => {
       return res.status(500).json({ message: "Internal server error" });
   }
 });
-
+//record missed habit
+app.post("/habits/:habitId/missed",async (req, res) => {
+  try {
+      const token = req.headers.authorization.split(" ")[1];
+      const habitId = req.params.habitId;
+      const user = await User.findOne({ auth: token });
+      if (!user) {
+          return res.status(404).json({ message: "User not found" });
+      }
+      const habit = await Habit.findOne({ _id: habitId, user: user._id });
+      if (!habit) {
+          return res.status(404).json({ message: "Habit not found" });
+      }
+      const newRecord = new Record({
+          habit: habitId,
+          //date yyyy-MM-DD
+          date: new Date(),
+          status: 'Incomplete',
+          note: req.body.note
+      });
+      const savedRecord = await newRecord.save();
+      return res.status(201).json(savedRecord);
+  } catch (error) {
+      console.error("Error adding record:", error);
+      return res.status(500).json({ message: "Internal server error" });
+  }
+});
 //auth function
 const validateAuthRequestBody = (req, res, next) => {
   if (Object.keys(req.body).includes('password', 'email')) {
