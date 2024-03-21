@@ -8,8 +8,8 @@ const userRoutes = require('./routes/userRoutes');
 
 const bcrypt = require('bcryptjs');
 
-const PORT = ;
-mongoose.connect()
+const PORT = process.env.DATABASE_URL;
+mongoose.connect(process.env.DATABASE_URL);
 
 const db = mongoose.connection;
 db.once("open", () => console.log("connected to mongoDB!!!!"));
