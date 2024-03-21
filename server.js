@@ -9,7 +9,7 @@ const userRoutes = require('./routes/userRoutes');
 const bcrypt = require('bcryptjs');
 
 const PORT = process.env.DATABASE_URL;
-mongoose.connect(process.env.DATABASE_URL)
+mongoose.connect(process.env.DATABASE_URL);
 
 const db = mongoose.connection;
 db.once("open", () => console.log("connected to mongoDB!!!!"));
@@ -54,7 +54,7 @@ app.get("/habits", (req, res) => {
     Habit.find({ user }).then((results) =>
     res.status(200).json(results))
   })
-})
+});
 //Add habit
 app.post("/habits", (req, res) => {
   const token = req.headers.authorization.split(" ");
@@ -67,6 +67,18 @@ app.post("/habits", (req, res) => {
         return res.status(200).json(newHabit);
       })
     .catch((error) => res.status(400).json({ message: "Bad request" }));
+});
+//delete habit
+app.delete('/habits/:habitId', (req, res) => {
+  Habit.findByIdAndDelete(req.params.habitId)
+    .then((result) => {
+      if (!result) {
+        res.status(404).json({ message: 'Habit not found' })
+      } else {
+        res.status(204).json()
+      }
+    })
+    .catch((error) => res.status(400).json({ message: error.message }))
 })
 //add simple done record
 app.post("/habits/:habitId/done",async (req, res) => {
